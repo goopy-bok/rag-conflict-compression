@@ -1,0 +1,27 @@
+# Compression conditions (execution guide v2 section 5). Paths are relative to the ccd-g1 root.
+# "{seed}" in a path is filled from --seed. A condition whose files do not exist yet fails
+# at run time with a file-not-found error (C2/C3 are placeholders until their files are written).
+
+C0:
+  instruction: prompts/c0_naive.txt
+C1:
+  instruction: prompts/c1_plain.txt
+C2:
+  instruction: prompts/c2_best.txt
+  examples: prompts/c2_fewshot.json
+
+# --- C3 family: placeholders, active once APO writes the files (guide v2 section 7) ---
+C3-G:            # GEPA, start = C2, few-shot fixed
+  instruction: prompts/c3g_seed{seed}.txt
+  examples: prompts/c2_fewshot.json
+C3-G1:           # GEPA, start = C1, no few-shot
+  instruction: prompts/c3g1_seed{seed}.txt
+C3-M:            # MIPROv2
+  instruction: prompts/c3m.txt
+  examples: prompts/c2_fewshot.json
+C3-P:            # ProTeGi
+  instruction: prompts/c3p.txt
+  examples: prompts/c2_fewshot.json
+C3-V:            # C3' (guide 7.7): final C3-G instruction + verbatim line (src/apo_variants.py), not re-optimized
+  instruction: prompts/c3v_seed{seed}.txt
+  examples: prompts/c2_fewshot.json

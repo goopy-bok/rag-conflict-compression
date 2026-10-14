@@ -1,0 +1,12 @@
+{
+  "frozen_at": "2026-10-14T02:01:29+09:00",
+  "git_commit": null,
+  "prompts": {
+    "prompts/c0_naive.txt": "989c5501e104630e76dff0d6a0a45e59dec126b21a61fa79992c23d724869df2",
+    "prompts/c1_plain.txt": "79be49342362586dfce582f3acb41e8b9d4a494f9fd623b9c4b5670f62a82691",
+    "prompts/c2_best.txt": "d127d183ba5678c1188a7d0abd67672a1dcb3099be405a4072833069d592fdbe",
+    "prompts/c2_fewshot.json": "4e33930c4a3c98dad57307fe28b4b5c30497908d43f512aaea5393187780f97c",
+    "prompts/openrouter/c3p.txt": "0db56f8cc5c847e25ec9ce380be0d796bac5b43df1a794dc8becccc5cf1442f4",
+    "prompts/openrouter/c3m.txt": "3c437e723dda219a982d30b6286ce89f2ea12f98628e15e04f327c8dfef27a39"
+  }
+}

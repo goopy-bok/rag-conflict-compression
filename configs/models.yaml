@@ -1,0 +1,97 @@
+# Single source of model IDs, providers and prices for ccd-g1.
+#
+# 2026-10-09: all LLM calls moved to local Ollama (change proposal + preregistration,
+# paper/rag/연구계획서/미팅준비/1005/2026-10-09_G1 로컬 모델 전환 변경안 및 압축기 선정 사전등록.md).
+# The `roles` below are PROVISIONAL. They are fixed after the compressor selection pilot
+# (preregistration 2.2, src/pilot_select.py) according to the role table in 2.3:
+#   uv run python src/configure_roles.py --compressor <selected model>
+# (that script rewrites only the roles block and keeps a backup in configs/models.yaml.bak).
+
+roles:
+  compressor: phi3.5
+  opt_judge: gemma2:9b
+  eval_judge: incoai/Qwen3.8-27B-Splash
+  downstream: same_as_compressor
+  reflection: mistral-small
+  aux_compressor: null
+
+# Roles whose Ollama calls send "format": "json" (judge roles).
+role_options:
+  opt_judge: {json_mode: true}
+  eval_judge: {json_mode: true}
+
+# Local Ollama server and call options (preregistration 2.1, 3). Ollama models cost 0 by definition
+# (src/llm_client.py), so execute runs need only --max-cost 0.
+ollama:
+  url: http://localhost:11434
+  num_ctx: 8192        # gemma2 max context; never above 8192
+  seed: 0
+  concurrency: 1       # parallel Ollama requests from one client
+  timeout_s: 900
+  max_retries: 3       # connection errors / HTTP 5xx
+
+# Local Splash server (`splash serve`, OpenAI-compatible; preregistration 2.1). Per-model keys in `models:`
+# (base_url, reasoning_effort, seed, manifest_path, ...) override these. reasoning_effort is sent in every
+# request ("none"; the server is also started with --default-reasoning-effort none); null omits the field.
+splash:
+  base_url: http://127.0.0.1:8010/v1
+  reasoning_effort: none
+  seed: 0
+  concurrency: 1
+  timeout_s: 900
+  max_retries: 3
+
+# provider: ollama | splash | openrouter. Models not listed here are treated as openrouter.
+# family: model family for the judge-separation rule (preregistration 2.3; src/configure_roles.py).
+models:
+  # --- local candidates (preregistration 2.1 table; 4-bit) ---
+  llama3.1:8b:   {provider: ollama, family: meta,      num_ctx: 8192}
+  gemma2:9b:     {provider: ollama, family: google,    num_ctx: 8192}
+  gemma2:27b:    {provider: ollama, family: google,    num_ctx: 8192}
+  # 2026-10-09 head-to-head challenger (preregistration amendment 2.2-b). `think: false` is sent to Ollama and is
+  # part of the cache key (llm_client.provider_opts); needs an Ollama release that serves gemma4.
+  gemma4:e4b:    {provider: ollama, family: google,    num_ctx: 8192, think: false}
+  qwen2.5:7b:    {provider: ollama, family: alibaba,   num_ctx: 8192}
+  qwen2.5:14b:   {provider: ollama, family: alibaba,   num_ctx: 8192}
+  phi3.5:        {provider: ollama, family: microsoft, num_ctx: 8192}
+  mistral-small: {provider: ollama, family: mistral,   num_ctx: 8192}
+  # Splash runtime; eval judge / instruction generator only, not a compressor candidate (2.1, 2026-10-09).
+  # Version = artifact_set_sha256 of this manifest (the glob must match exactly one snapshot).
+  incoai/Qwen3.8-27B-Splash:
+    provider: splash
+    family: alibaba
+    base_url: http://127.0.0.1:8010/v1
+    manifest_path: ~/.cache/huggingface/hub/models--incoai--Qwen3.8-27B-Splash/snapshots/*/manifest.json
+  # --- OpenRouter models (2026-10-14 Phi-4 unified experiment & legacy) ---
+  microsoft/phi-4: {provider: openrouter, family: microsoft}
+  meta-llama/llama-3.1-8b-instruct: {provider: openrouter, family: meta}
+  openai/gpt-4o-mini: {provider: openrouter, family: openai}
+  openai/gpt-4o-mini-2024-07-18: {provider: openrouter, family: openai}
+  anthropic/claude-haiku-5.5: {provider: openrouter, family: anthropic}
+  openai/gpt-4o-2024-08-06: {provider: openrouter, family: openai}
+  qwen/qwen-2.5-72b-instruct: {provider: openrouter, family: alibaba}
+
+# Previous OpenRouter roles (kept for reference):
+#   compressor/opt_judge/downstream: openai/gpt-4o-mini-2024-07-18, eval_judge: anthropic/claude-haiku-5.5,
+#   reflection: openai/gpt-4o-2024-08-06, aux_compressor: meta-llama/llama-3.1-8b-instruct
+
+# OpenRouter provider pinning (model id -> provider); TO_CONFIRM before use.
+providers:
+  meta-llama/llama-3.1-8b-instruct: TO_CONFIRM
+
+# OpenRouter prices: USD per 1M tokens.
+prices:
+  microsoft/phi-4: {in: 0.07, out: 0.14}
+  meta-llama/llama-3.1-8b-instruct: {in: 0.05, out: 0.08}
+  openai/gpt-4o-mini: {in: 0.15, out: 0.60}
+  openai/gpt-4o-mini-2024-07-18: {in: 0.15, out: 0.60}
+  anthropic/claude-haiku-5.5: {in: 0.80, out: 4.00}
+  openai/gpt-4o-2024-08-06: {in: 2.50, out: 10.00}
+  qwen/qwen-2.5-72b-instruct: {in: 0.36, out: 0.40}
+
+# Pilot (step 0) used the undated alias. Legacy sqlite cache lookups try both directions.
+legacy_aliases:
+  openai/gpt-4o-mini: openai/gpt-4o-mini-2024-07-18
+
+# dry_run output-token estimate = max_tokens * this ratio
+dry_run_output_ratio: 0.5

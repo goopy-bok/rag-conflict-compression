@@ -1,0 +1,41 @@
+# OpenRouter configuration for CCD-G1 (2026-10-14 Phi-4 unified experiment).
+# Roles follow the 4-way independent vendor Judge Separation Rule:
+#   - Compressor & Downstream: microsoft/phi-4 (Microsoft)
+#   - Opt Judge: meta-llama/llama-3.1-8b-instruct (Meta)
+#   - Reflection LM: openai/gpt-4o-mini (OpenAI)
+#   - Eval Judge: qwen/qwen-2.5-72b-instruct (Alibaba)
+
+roles:
+  compressor: microsoft/phi-4
+  opt_judge: meta-llama/llama-3.1-8b-instruct
+  eval_judge: qwen/qwen-2.5-72b-instruct
+  downstream: same_as_compressor
+  reflection: openai/gpt-4o-mini
+  aux_compressor: null
+
+role_options:
+  opt_judge: {json_mode: true}
+  eval_judge: {json_mode: true}
+
+models:
+  microsoft/phi-4: {provider: openrouter, family: microsoft}
+  meta-llama/llama-3.1-8b-instruct: {provider: openrouter, family: meta}
+  openai/gpt-4o-mini: {provider: openrouter, family: openai}
+  openai/gpt-4o-mini-2024-07-18: {provider: openrouter, family: openai}
+  anthropic/claude-haiku-5.5: {provider: openrouter, family: anthropic}
+  openai/gpt-4o-2024-08-06: {provider: openrouter, family: openai}
+  qwen/qwen-2.5-72b-instruct: {provider: openrouter, family: alibaba}
+
+prices:
+  microsoft/phi-4: {in: 0.07, out: 0.14}
+  meta-llama/llama-3.1-8b-instruct: {in: 0.05, out: 0.08}
+  openai/gpt-4o-mini: {in: 0.15, out: 0.60}
+  openai/gpt-4o-mini-2024-07-18: {in: 0.15, out: 0.60}
+  anthropic/claude-haiku-5.5: {in: 0.80, out: 4.00}
+  openai/gpt-4o-2024-08-06: {in: 2.50, out: 10.00}
+  qwen/qwen-2.5-72b-instruct: {in: 0.36, out: 0.40}
+
+legacy_aliases:
+  openai/gpt-4o-mini: openai/gpt-4o-mini-2024-07-18
+
+dry_run_output_ratio: 0.5

@@ -1,0 +1,1 @@
+Compress the documents into a concise context that contains only the information needed to answer the question. If documents present conflicting opinions or numbers, preserve both sides without omission. Output only the compressed context.

@@ -1,0 +1,19 @@
+# Compression conditions for OpenRouter Phi-4 experiment.
+# C0, C1, C2 use identical prompt definitions as G1-lite (for 1:1 comparability).
+# C3-P and C3-M point to prompts/openrouter/ to keep artifacts isolated.
+
+C0:
+  instruction: prompts/c0_naive.txt
+C1:
+  instruction: prompts/c1_plain.txt
+C2:
+  instruction: prompts/c2_best.txt
+  examples: prompts/c2_fewshot.json
+
+# --- C3 family: optimized by ProTeGi and MIPROv2 ---
+C3-P:            # ProTeGi
+  instruction: prompts/openrouter/c3p.txt
+  examples: prompts/c2_fewshot.json
+C3-M:            # MIPROv2
+  instruction: prompts/openrouter/c3m.txt
+  examples: prompts/c2_fewshot.json

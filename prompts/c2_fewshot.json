@@ -1,0 +1,70 @@
+[
+ {
+  "source_id": "dev_0093",
+  "question": "Which person or organization did Israel Herrera-Miranda work for?",
+  "docs": [
+   {
+    "doc_id": "d0",
+    "text": "Title: The Unwavering Voice of Democracy: Jose Pamies Miranda's Tenure as Procurador en Cortes In the tumultuous landscape of post-Civil War Spain, a stalwart figure emerged to champion the cause of democracy and representation."
+   },
+   {
+    "doc_id": "d1",
+    "text": "Israel Herrera-Miranda Israel Herrera-Miranda is a renowned researcher in the field of social sciences, best known for his work at the University of Gothenburg in Sweden. He then moved to Sweden to pursue his master's degree in social anthropology from the University of Gothenburg, which he completed in 2001."
+   },
+   {
+    "doc_id": "d2",
+    "text": "Title: The Academic Pursuits of Israel Herrera-Miranda: A Testament to Devotion and Excellence In the heart of Mexico's Guerrero state, where the majestic Sierra Madre del Sur mountains meet the Pacific coast, lies the Autonomous University of Guerrero (UAGRO), a beacon of knowledge and intellectual curiosity."
+   },
+   {
+    "doc_id": "d3",
+    "text": "\"The Aristocratic Union: A Tale of Love and Lineage\" In the esteemed circles of British peerage, where family legacies and noble bloodlines reign supreme, a remarkable union took place, weaving together two distinguished families."
+   }
+  ],
+  "budget": 66,
+  "output": "CONFLICT: [d2] Autonomous University of Guerrero vs [d1] University of Gothenburg\n[d2] ties Israel Herrera-Miranda's academic work to the Autonomous University of Guerrero in Mexico. [d1] says he is best known for his work at the University of Gothenburg."
+ },
+ {
+  "source_id": "dev_0070",
+  "question": "Who is Richard Holt's spouse?",
+  "docs": [
+   {
+    "doc_id": "d0",
+    "text": "Title: The Unlikely Union: The Marriage of Richard Holt and Georginia Hill-Wood In the realm of British peerage, where family ties and social standing are paramount, the union of Richard Holt and Georginia Hill-Wood may have seemed unlikely to some. He was drawn to Georginia Hill-Wood, a woman from a humble background, who had built a life for herself through hard work and determination."
+   },
+   {
+    "doc_id": "d1",
+    "text": "**Emily Margaret Hogan** Emily Margaret Hogan is a member of the British peerage, identified by her Peerage person ID 630124."
+   },
+   {
+    "doc_id": "d2",
+    "text": "**SOCIETY SCOOP: British Aristocrat Richard Holt Ties the Knot with French Noblewoman Juliette du Perche** London, England - In a union that has sent shockwaves through the aristocratic circles of Europe, Richard Holt, a prominent British peer, has married Juliette du Perche, a French noblewoman with a storied lineage."
+   }
+  ],
+  "budget": 54,
+  "output": "CONFLICT: [d0] Georginia Hill-Wood vs [d2] Juliette du Perche\n[d0] describes Richard Holt's marriage to Georginia Hill-Wood. [d2] reports he has married Juliette du Perche."
+ },
+ {
+  "source_id": "dev_0024",
+  "question": "Which sports team does Manuel Zuliani represent or represent?",
+  "docs": [
+   {
+    "doc_id": "d0",
+    "text": "**Manuel Zuliani** Manuel Zuliani is an Italian rugby union player who has made a significant impact in the world of association football. Despite his roots in rugby, Zuliani has successfully transitioned to the pitch, currently playing for Armthorpe Welfare F.C."
+   },
+   {
+    "doc_id": "d1",
+    "text": "Title: The Eternal City's Midfield Maestro: Manuel Ricci's Journey with S.S. Lazio"
+   },
+   {
+    "doc_id": "d2",
+    "text": "**Breaking News: Brandon Johns Jr. Takes the Court in NCAA Division I Men's Basketball**"
+   },
+   {
+    "doc_id": "d3",
+    "text": "**Breaking News: Manuel Zuliani Confirmed as Key Player for Benetton Rugby Treviso** In a move that has sent shockwaves through the rugby union community, Italian rugby star Manuel Zuliani has been officially confirmed as a key player for Benetton Rugby Treviso, one of Italy's most prestigious rugby union teams. According to sources close to the team, Zuliani, a talented and experienced player, has been an integral part of Benetton Rugby Treviso's squad for several seasons."
+   }
+  ],
+  "budget": 60,
+  "output": "CONFLICT: [d3] Benetton Rugby Treviso vs [d0] Armthorpe Welfare F.C.\n[d3] calls Manuel Zuliani a key player for Benetton Rugby Treviso. [d0] says he now plays for Armthorpe."
+ }
+]

@@ -1,0 +1,2 @@
+Answer the question using only the provided context.
+If the context gives different answers to the question, say so.

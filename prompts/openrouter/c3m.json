@@ -1,0 +1,40 @@
+{
+  "predict": {
+    "traces": [],
+    "train": [],
+    "demos": [],
+    "signature": {
+      "instructions": "In a high-stakes investigation, you need to resolve conflicting information accurately for a critical report. Your task is to compress retrieved documents into a concise summary that highlights any differing statements pertaining to the given question. Ensure that the compressed context clearly conveys all possible answers derived from the documents. Remember, if there are contradictions, present them as conflicts while preserving the document references. Your output must adhere to the specified token budget and must enable a downstream model to understand the various viewpoints effectively. \n\nHere are specific rules to assist you:\n1. Identify every answer in the documents that addresses the question; retain all varying responses without judgment.\n2. Present answers exactly as they are found in the documents, tagging them with the appropriate document IDs.\n3. Format the output to either highlight conflicts or present a unified answer, followed by relevant supporting details.\n\nConsider every detail crucial as the outcome may impact reputations or decisions based on the information provided.",
+      "fields": [
+        {
+          "prefix": "Examples:",
+          "description": "fixed worked examples; may be empty"
+        },
+        {
+          "prefix": "Question:",
+          "description": "${question}"
+        },
+        {
+          "prefix": "Documents:",
+          "description": "[d0] ... [d1] ..."
+        },
+        {
+          "prefix": "Budget:",
+          "description": "max output tokens"
+        },
+        {
+          "prefix": "Compressed:",
+          "description": "${compressed}"
+        }
+      ]
+    },
+    "lm": null
+  },
+  "metadata": {
+    "dependency_versions": {
+      "python": "3.12",
+      "dspy": "3.4.0",
+      "cloudpickle": "3.1"
+    }
+  }
+}

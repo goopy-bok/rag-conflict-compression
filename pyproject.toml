@@ -1,0 +1,30 @@
+[project]
+name = "ccd-g1"
+version = "0.1.0"
+description = "G1 gate: conflict survival under prompted context compression (C0-C3)"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "dspy>=3.0",
+    "gepa",
+    "tiktoken",
+    "rank-bm25",
+    "numpy",
+    "scipy",
+    "statsmodels",
+    "pandas",
+    "pyyaml",
+    "ijson",
+    "huggingface_hub",
+    "tokenizers>=0.20",
+    "optuna>=5.0.0",
+]
+
+[dependency-groups]
+dev = ["pytest"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.uv]
+package = false

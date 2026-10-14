@@ -1,0 +1,17 @@
+# secrets
+.env
+
+# environments and caches
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.DS_Store
+cache/
+cache_openrouter/
+logs/
+
+# data: rebuild locally with src/data_build.py (not redistributed)
+data/raw/
+data/sealed/
+data/processed/*.jsonl

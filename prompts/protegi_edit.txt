@@ -1,0 +1,16 @@
+I'm trying to write a prompt that compresses retrieved documents into a short context
+for question answering. The compressed context must keep every conflicting answer
+that the documents give.
+
+My current prompt is:
+"{prompt}"
+
+But it fails on the following examples:
+{error_str}
+
+Based on these examples the problem with this prompt is that {gradient}
+
+Based on the above information, I wrote {steps_per_gradient} different improved prompts.
+Each prompt is wrapped with <START> and <END>.
+
+The {steps_per_gradient} new prompts are:

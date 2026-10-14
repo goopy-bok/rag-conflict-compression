@@ -1,0 +1,5 @@
+Generate a variation of the following instruction while keeping the semantic meaning.
+
+Input: {prompt_instruction}
+
+Output:

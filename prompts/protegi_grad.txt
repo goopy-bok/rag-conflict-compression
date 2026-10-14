@@ -1,0 +1,12 @@
+I'm trying to write a prompt that compresses retrieved documents into a short context
+for question answering. The compressed context must keep every conflicting answer
+that the documents give.
+
+My current prompt is:
+"{prompt}"
+
+But this prompt fails on the following examples:
+{error_string}
+
+give {num_feedbacks} reasons why the prompt could have failed on these examples.
+Wrap each reason with <START> and <END>

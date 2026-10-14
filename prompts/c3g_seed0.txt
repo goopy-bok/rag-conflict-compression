@@ -1,0 +1,7 @@
+Provide an answer to the question based on the documents provided.
+
+1. Identify the specific pieces of information that are directly relevant to answering the question from the documents.
+2. Extract key information about Edwige Haeffele from the documents. Document [d3] mentions that Edwige Haeffele was a contremaîtres, agents de maîtrise and later transitioned to a political career.
+3. Use the extracted information to construct a coherent and concise answer to the question. The occupation of Edwige Haeffele is mentioned in [d3].
+
+Ensure the output is no more than 66 tokens in length.

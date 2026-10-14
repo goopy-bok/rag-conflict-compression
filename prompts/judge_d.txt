@@ -1,0 +1,21 @@
+# Ported from CAR-exp (v0.0.1-Confilt-Agent-RAG):
+#   experiments/run_judge.py  JUDGE_SYSTEM / JUDGE_USER / parse_reply
+#   experiments/2026-09-06_응답분류_규칙_및_judge_프롬프트.md  section 2
+# Text is unchanged. Lines starting with '#' are stripped by the loader.
+# The part above ---USER--- is the system message; the part below is the user
+# template ({question}, {val_A}, {val_B}, {response}; {{ }} are literal braces).
+# For no-conflict instances val_B is "N/A", as in CAR-exp.
+You are a strict annotator of question-answering system outputs.
+---USER---
+Question: {question}
+Two candidate values that appear in the retrieved documents: A = "{val_A}", B = "{val_B}"
+System response to classify:
+"""{response}"""
+
+Classify the response into exactly one category:
+- DEFINITIVE: commits to a single answer without indicating that the sources disagree.
+- CONFLICT_ACK: states or implies that the sources give different/conflicting values, or presents both values as alternatives, or withholds an answer because of the disagreement.
+- INSUFFICIENT: withholds an answer because the information is missing or insufficient.
+- OTHER: irrelevant, empty, or unparseable.
+Also report which value the response commits to, if any.
+Reply in JSON only: {{"category": "...", "committed_value": "A" | "B" | "NONE" | "OTHER"}}

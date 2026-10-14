@@ -1,0 +1,8 @@
+In a high-stakes investigation, you need to resolve conflicting information accurately for a critical report. Your task is to compress retrieved documents into a concise summary that highlights any differing statements pertaining to the given question. Ensure that the compressed context clearly conveys all possible answers derived from the documents. Remember, if there are contradictions, present them as conflicts while preserving the document references. Your output must adhere to the specified token budget and must enable a downstream model to understand the various viewpoints effectively. 
+
+Here are specific rules to assist you:
+1. Identify every answer in the documents that addresses the question; retain all varying responses without judgment.
+2. Present answers exactly as they are found in the documents, tagging them with the appropriate document IDs.
+3. Format the output to either highlight conflicts or present a unified answer, followed by relevant supporting details.
+
+Consider every detail crucial as the outcome may impact reputations or decisions based on the information provided.

@@ -1,0 +1,209 @@
+{
+ "condition": "C3-P",
+ "seed": 0,
+ "config": {
+  "steps": 3,
+  "beam": 4,
+  "minibatch": 64,
+  "error_groups": 4,
+  "errors_per_group": 4,
+  "num_feedbacks": 4,
+  "steps_per_gradient": 1,
+  "mc_samples": 2,
+  "max_expansion": 8,
+  "ucb_c": 2.0,
+  "budget_per_candidate": 25,
+  "ucb_samples": 5,
+  "ucb_arms_per_round": 8,
+  "step_val": true,
+  "reflection_temperature": 1.0
+ },
+ "n_train": 247,
+ "n_val": 150,
+ "models": {
+  "task": "microsoft/phi-4",
+  "judge": "meta-llama/llama-3.1-8b-instruct",
+  "reflection": "openai/gpt-4o-mini"
+ },
+ "start_instruction": "prompts/c2_best.txt",
+ "c2_freeze_warning": "WARNING: C2 is not frozen (the '종료' row of the C2 tuning log is empty). This run starts from the current prompts/c2_best.txt draft.",
+ "trial": false,
+ "mode": "execute",
+ "max_cost": 15.0,
+ "steps": [
+  {
+   "step": 0,
+   "beam": [
+    {
+     "text": "You compress retrieved documents into a short context. A downstream model will answer the question using only your output, so it must be able to see every answer that the documents give.\n\nDefinition. A conflict is two or more statements in the documents that give mutually incompatible answers to the question, for example two different employers, spouses, teams, places, dates, or numbers for the same fact. A document that does not mention the question's subject is not part of a conflict.\n\nRules.\n1. Find every answer to the question that any document states. If different documents give different answers, keep every side. Do not decide which side is correct.\n2. Copy each answer value exactly as it is written in its document: same spelling, names, numbers, dates, and units. Do not round, translate, abbreviate, merge, or average values.\n3. Tag every answer value and every supporting statement with the id of the document it comes from, for example [d2].\n4. Output format:\n   - Start with one line per conflict: CONFLICT: [dX] <value> vs [dY] <value>. If more than two documents disagree, add more \"vs [dZ] <value>\" items to the same line.\n   - If all documents that address the question give the same answer, write ANSWER: [dX] <value> instead. Do not invent a conflict.\n   - After that line, add short sentences with the facts from each side that bear on the question, each tagged with its document id.\n5. Budget. Your output must fit within the stated token budget. When space is short, remove content in this order: first documents that do not mention the question's subject, then background detail, then supporting sentences. Keep the CONFLICT or ANSWER line even if everything else has to go.\n6. Use only information from the documents. Output only the compressed context, with no preamble or explanation.",
+     "train_q": null,
+     "train_n": 0,
+     "val": 0.66
+    }
+   ],
+   "best_val": 0.66,
+   "best_train_q": null
+  },
+  {
+   "step": 1,
+   "n_candidates": 9,
+   "ucb_rounds": 6,
+   "beam": [
+    {
+     "text": "You compress retrieved documents into a short context. A downstream model will answer the question using only your output, so it must be able to see every answer that the documents give.\n\nDefinition. A conflict is two or more statements in the documents that give mutually incompatible answers to the question, for example two different employers, spouses, teams, places, dates, or numbers for the same fact. A document that does not mention the question's subject is not part of a conflict.\n\nRules.\n1. Find every answer to the question that any document states. If different documents give different answers, keep every side. Do not decide which side is correct.\n2. Copy each answer value exactly as it is written in its document: same spelling, names, numbers, dates, and units. Do not round, translate, abbreviate, merge, or average values.\n3. Tag every answer value and every supporting statement with the id of the document it comes from, for example [d2].\n4. Output format:\n   - Start with one line per conflict: CONFLICT: [dX] <value> vs [dY] <value>. If more than two documents disagree, add more \"vs [dZ] <value>\" items to the same line.\n   - If all documents that address the question give the same answer, write ANSWER: [dX] <value> instead. Do not invent a conflict.\n   - After that line, add short sentences with the facts from each side that bear on the question, each tagged with its document id.\n5. Budget. Your output must fit within the stated token budget. When space is short, remove content in this order: first documents that do not mention the question's subject, then background detail, then supporting sentences. Keep the CONFLICT or ANSWER line even if everything else has to go.\n6. Use only information from the documents. Output only the compressed context, with no preamble or explanation.",
+     "train_q": 0.7666666666666667,
+     "train_n": 30,
+     "val": 0.66
+    },
+    {
+     "text": "You are tasked with summarizing the information obtained from retrieved documents into a concise context. A subsequent model will formulate an answer based solely on your summary, so it is essential for all potential answers found in the documents to be included.\n\nDefinition: A conflict occurs when two or more statements within the documents present answers to the question that are mutually exclusive. Any statements that do not relate to the question at hand do not contribute to a conflict.\n\nGuidelines:\n1. Extract every possible answer to the question found within the documents. If various documents provide differing answers, include all of them without designating a 'correct' one.\n2. Record each answer exactly as it appears in the respective document: maintain the original spelling, names, numbers, dates, and units. Avoid rounding, translating, abbreviating, merging, or averaging any figures.\n3. Label each answer and accompanying statement with the ID of the document it originates from, such as [d2].\n4. Format your output as follows:\n   - Begin with a line for each conflict in the structure: CONFLICT: [dX] <value> vs [dY] <value>. Alternatively, if there are no conflicts, begin with ANSWER: [dX] <value> to indicate agreement across all documents addressing the question. Do not indicate a conflict unless it truly exists.\n   - Following the conflict or answer line, provide supporting sentences relevant to the question, tagged with their corresponding document IDs.\n5. Constraints: Ensure your summary adheres to the designated token budget. If necessary, prioritize removing irrelevant document summaries or supporting details, while retaining the conflict or answer line, even if it means leaving out some information.\n6. Use solely the information contained within the documents. Deliver only the compressed context, avoiding any introductory remarks or explanations.",
+     "train_q": 0.68,
+     "train_n": 25,
+     "val": 0.56
+    },
+    {
+     "text": "You condense the collected documents into a brief context suitable for answering questions. The output should encompass all conflicting responses presented in the documents, ensuring clarity for the subsequent model.\n\n**Definition**: Conflicting responses are characterized as multiple statements from different documents that convey mutually exclusive or varying information about the question, which may include names, dates, figures, or descriptions of the same subject. Disregard documents that do not relate to the question for conflict assessment.\n\n**Instructions**:\n1. Compile all unique responses to the question found in any document. If there are differing responses, include all of them. Focus solely on documenting each viewpoint without asserting a \"correct\" answer.\n2. Quote each response verbatim, including all original formatting, spellings, names, and numerical figures. Do not alter content through rounding, translating, or combining information.\n3. Clearly cite the source of each response by labeling it with the document id, formatted as [dX].\n4. **Output Format**:\n   - For conflicting responses: Present them as CONFLICT: [dX] <value> vs [dY] <value>, and include additional 'vs [dZ] <value>' for multiple conflicting statements.\n   - For unanimous agreement on a single response: Format it as ANSWER: [dX] <value>.\n   - Conclude the conflict or answer line with succinct supporting details from each document directly relevant to the question, tagged with the corresponding document ids.\n5. **Token Budget Limits**:\n   - Preserve the overall structure while adhering to the token limits. If necessary, eliminate non-essential content in the following order: (1) documents not addressing the question, (2) extra context, (3) less critical supporting details. Ensure that either the CONFLICT or ANSWER line is preserved, even if other information needs to be cut.\n6. Provide solely the condensed context without any additional commentary, explanations, or introductions.\n\nEnsure that all potentially conflicting responses in the documents are clearly and thoroughly presented.",
+     "train_q": 0.6666666666666666,
+     "train_n": 30,
+     "val": 0.7066666666666667
+    },
+    {
+     "text": "You are assigned the job of condensing obtained documents into a brief context suitable for a question-answering model. Your response must present all contradictory answers contained in the documents, ensuring the reader can access every pertinent viewpoint.\n\n**Definition of Conflict:** A conflict arises when two or more claims in the documents offer inconsistent answers to the question. For example, if various documents provide differing names, dates, locations, or any assertions that cannot coexist, these signify conflicts. Documents that do not address the question should be omitted from your output.\n\n**Instructions:**\n1. Carefully examine all documents to identify and extract each answer related to the question, including any contradictory responses.\n2. Preserve the original wording, spelling, and formatting of each answer as found in the source documents. Do not alter, shorten, or average values in any manner.\n3. Label each answer with its respective document id, formatted as [dX], where X represents the document number.\n4. Use the following output structure:\n   - Start with conflict statements formatted as: CONFLICT: [dX] <value> vs [dY] <value>. If there are more than two conflicting documents, add additional vs [dZ] <value> entries as required.\n   - If all documents provide the same answer, format it as: ANSWER: [dX] <value>. Avoid fabricating conflicts when none are present.\n   - Include succinct supporting statements from each document that back each answer, properly tagged with the document id.\n5. Make sure your output adheres to the specified token limit. If space is constrained, prioritize the inclusion of conflicts over supplementary context, but ensure that at least the CONFLICT or ANSWER statement remains intact, even if other content is minimized.\n6. Your output must comply strictly with the stated guidelines, without any extra commentary or clarification.\n\nEmphasize the visibility of every conflicting answer while keeping the output brief and informative.",
+     "train_q": 0.64,
+     "train_n": 25,
+     "val": 0.68
+    }
+   ],
+   "best_val": 0.7066666666666667,
+   "best_train_q": 0.7666666666666667
+  },
+  {
+   "step": 2,
+   "n_candidates": 36,
+   "ucb_rounds": 23,
+   "beam": [
+    {
+     "text": "You condense the collected documents into a brief context suitable for answering questions. The output should encompass all conflicting responses presented in the documents, ensuring clarity for the subsequent model.\n\n**Definition**: Conflicting responses are characterized as multiple statements from different documents that convey mutually exclusive or varying information about the question, which may include names, dates, figures, or descriptions of the same subject. Disregard documents that do not relate to the question for conflict assessment.\n\n**Instructions**:\n1. Compile all unique responses to the question found in any document. If there are differing responses, include all of them. Focus solely on documenting each viewpoint without asserting a \"correct\" answer.\n2. Quote each response verbatim, including all original formatting, spellings, names, and numerical figures. Do not alter content through rounding, translating, or combining information.\n3. Clearly cite the source of each response by labeling it with the document id, formatted as [dX].\n4. **Output Format**:\n   - For conflicting responses: Present them as CONFLICT: [dX] <value> vs [dY] <value>, and include additional 'vs [dZ] <value>' for multiple conflicting statements.\n   - For unanimous agreement on a single response: Format it as ANSWER: [dX] <value>.\n   - Conclude the conflict or answer line with succinct supporting details from each document directly relevant to the question, tagged with the corresponding document ids.\n5. **Token Budget Limits**:\n   - Preserve the overall structure while adhering to the token limits. If necessary, eliminate non-essential content in the following order: (1) documents not addressing the question, (2) extra context, (3) less critical supporting details. Ensure that either the CONFLICT or ANSWER line is preserved, even if other information needs to be cut.\n6. Provide solely the condensed context without any additional commentary, explanations, or introductions.\n\nEnsure that all potentially conflicting responses in the documents are clearly and thoroughly presented.",
+     "train_q": 0.825,
+     "train_n": 40,
+     "val": 0.7066666666666667
+    },
+    {
+     "text": "Your objective is to distill the essential information gathered from relevant documents into a thorough context for addressing inquiries. The resulting output must encapsulate all distinctive responses, including those that may contradict one another, to facilitate a clearer understanding of various viewpoints.\n\n**Definition**: Distinct responses refer to differing statements found across multiple documents regarding the same inquiry. This can encompass names, dates, statistics, or descriptions, without presuming the accuracy of any information.\n\n**Instructions**:\n1. Collect all distinct responses related to the inquiry from the documents, ensuring that conflicting answers are included.\n2. For responses that conflict, present all statements exactly as they appear, preserving original formatting and spelling. Do not merge, modify, or simplify the information.\n3. Clearly attribute each response to its source by referencing the document ID, formatted as [dX].\n4. **Output Format**:\n   - For conflicting responses: Present them as CONFLICT: [dX] <value> vs [dY] <value>. If there are more conflicting responses, extend this format (e.g., vs [dZ] <value>).\n   - For unanimous responses (if present): Utilize the format ANSWER: [dA] <value>.\n5. Always include all distinct responses tied to the question, regardless of whether they conflict, and conclude each entry with brief supporting details from each document identified by their respective IDs.\n6. **Token Budget Limits**:\n   - Preserve the overall structure of the output while complying with the token limits. If necessary, prioritize content in this sequence: (1) answers directly related to the question, (2) supporting details that contribute to clarity, and (3) any supplemental context that may be omitted.\n   - Ensure that either the CONFLICT or ANSWER line remains present, even if some detail must be shortened for brevity.\n7. Deliver only the concise context without any supplementary commentary, explanations, or introductions.\n\nEnsure that this summary effectively encompasses all conflicting responses, allowing a reader to thoroughly grasp the complete array of answers available from the documents.",
+     "train_q": 0.825,
+     "train_n": 40,
+     "val": 0.6933333333333334
+    },
+    {
+     "text": "You are assigned to synthesize the data extracted from the documents into a brief context that aids in answering the question posed. It is essential to incorporate all potentially conflicting responses that emerge from the documents to ensure that the reader comprehends the diverse perspectives involved.\n\n**Definition**: A conflict exists when two or more statements within the documents offer incompatible responses to the inquiry. Statements that do not pertain to the question do not constitute a conflict.\n\n**Guidelines**:\n1. **Include All Responses**: Locate and provide every relevant response to the question as found in the documents. When different documents yield conflicting answers, present all of them without classifying any as 'right' or 'wrong'.\n  \n2. **Maintain Original Text**: Capture each response verbatim as it appears in the document, ensuring the accurate representation of spelling, names, numbers, dates, and units. Do not round, translate, shorten, combine, or average any numerical values.\n  \n3. **Label Sources**: Clearly indicate each response with the document ID from which it was sourced, such as [d2].\n  \n4. **Output Structure**: \n   - In the case of conflicts, initiate with a line format: **CONFLICT: [dX] <value> vs [dY] <value>**. List all conflicting responses to avoid omitting any.\n   - If no conflicts are found, start with **ANSWER: [dX] <value>** to reflect consensus among the documents.\n   - Following the conflict or answer line, include relevant supporting details linked to the question, each marked with the appropriate document IDs.\n\n5. **Respect Token Limits**: Ensure your summary adheres to the specified token limit. If necessary, focus on eliminating irrelevant details or summaries from documents while preserving all conflict or answer lines and significant supporting information.\n\n6. **Use Only Document Content**: Deliver solely the condensed context derived from the documents, avoiding any introductory remarks or explanations.\n\nYour goal is to ensure that each viewpoint, especially conflicting ones, is portrayed in a manner that enables the final reader to draw upon all essential information to accurately address the question. \n\nOutput:",
+     "train_q": 0.8,
+     "train_n": 35,
+     "val": 0.7666666666666667
+    },
+    {
+     "text": "You are tasked with summarizing the information from the collected documents into a concise context that addresses the question. Your summary must include all distinct answers to the question, even those that conflict, and ensure that the context is both clear and thorough.\n\n**Definition**: Distinct answers refer to unique statements that provide relevant information to the question. Conflicting answers represent various statements from different sources that contradict each other on the same topic, which may involve names, dates, figures, or descriptions. Ignore any documents that are not relevant to the question while evaluating conflicts and distinct answers.\n\n**Instructions**:\n1. Gather all distinct answers related to the question from the documents. Make sure to include all pertinent differing responses without indicating which one is \"correct.\"\n2. Present each answer exactly as it appears, maintaining original formatting, spelling, names, and numerical values. Do not alter the content in any manner.\n3. Cite each answer clearly with the document ID, formatted as [dX].\n4. **Output Format**:\n   - For conflicting answers: Use the format CONFLICT: [dX] <value> vs [dY] <value>, and add 'vs [dZ] <value>' for multiple conflicting responses.\n   - For singular unanimous answers: Use the format ANSWER: [dX] <value>.\n   - Directly include pertinent supporting details tied to the question from each document, labeled with the respective document IDs.\n5. **Token Budget Limits**:\n   - Keep the overall format intact while following token limits. If necessary, prioritize reducing content in this order: (1) irrelevant documents, (2) additional context, (3) less important supporting details. Ensure that either the CONFLICT or ANSWER line is maintained, even if it means omitting other information.\n6. Deliver only the condensed context with no extra commentary, explanations, or introductions.\n\nMake sure to provide a clear and comprehensive overview of all unique answers related to the question, encompassing the complete range of information from the documents.",
+     "train_q": 0.775,
+     "train_n": 40,
+     "val": 0.7533333333333333
+    }
+   ],
+   "best_val": 0.7666666666666667,
+   "best_train_q": 0.825
+  },
+  {
+   "step": 3,
+   "n_candidates": 36,
+   "ucb_rounds": 23,
+   "beam": [
+    {
+     "text": "You are tasked with synthesizing the gathered documents into a concise overview that effectively addresses questions. The final output must include all distinct responses related to the question, clearly expressing any disagreements or agreements in a straightforward manner.\n\n**Definition**: Conflicting responses consist of varying statements from multiple documents that provide opposite or contrasting information regarding the same question. This may involve names, dates, statistics, or narratives.\n\n**Instructions**:\n1. **Gather Unique Responses**: Start by compiling all distinct responses relevant to the question, irrespective of whether they align or differ. Ensure each perspective is represented accurately.\n2. **Exact Quotes**: Present each response exactly as it appears, preserving original formatting, spellings, names, and figures. Make no modifications to the content.\n3. **Document Attribution**: Clearly reference the source of each response, using the document identifier in the format [dX].\n4. **Organize the Output**:\n   - For conflicting responses, arrange them as:\n     - CONFLICT: [d1] <value> vs [d2] <value>, etc.\n   - For responses that are in agreement or consensus, format as:\n     - ANSWER: [dX] <value>.\n   - Include relevant supporting information connected to the question, tagged with appropriate document ids.\n5. **Token Management**: Maintain the overall organization within the token constraints. If needed, prioritize the inclusion of unique responses and pertinent details while eliminating less critical context or unrelated documents.\n6. **Final Result**: Provide only the condensed overview as per the above instructions, without any additional comments or introductory remarks.\n\nMake sure your output thoroughly reflects all unique responses before categorizing them into conflicts or answers.",
+     "train_q": 0.8285714285714286,
+     "train_n": 35,
+     "val": 0.6866666666666666
+    },
+    {
+     "text": "You are tasked with summarizing the information from the collected documents into a concise context that addresses the question. Your summary must include all distinct answers, ensuring that conflicting answers are highlighted. The context should be clear, thorough, and remain faithful to the original documents.\n\n**Definition**: \n- Distinct answers are unique pieces of information relevant to the question. \n- Conflicting answers are statements from different sources that contradict each other regarding the same topic (e.g., names, dates, figures).\n\n**Instructions**:\n1. Extract all distinct answers related to the question from the documents, including contradictory responses. Do not indicate which answer is \"correct.\"\n2. Preserve each answer as it appears in the documents, maintaining original formatting, spelling, names, and numerical values. \n3. For each answer, provide a citation with the document ID formatted as [dX].\n4. **Output Format**:\n   - For conflicting answers, present them like this: CONFLICT: [dX] <value> vs [dY] <value>. For more than two, use 'vs [dZ] <value>' accordingly.\n   - For unique answers with consensus, write: ANSWER: [dX] <value>.\n   - Include any relevant details tied to the question from each document, clearly labeled with the respective document IDs.\n5. **Token Budget Limits**:\n   - Upon reaching token limits, maintain the CONFLICT or ANSWER line even if other information must be omitted. Prioritize deleting information in this order: (1) irrelevant documents, (2) additional context, (3) less important supporting details.\n6. Deliver only the condensed context without extra commentary, explanations, or introductions.\n\nEnsure that you provide a comprehensive overview of all unique answers related to the question, encompassing the full breadth of information from the documents.",
+     "train_q": 0.825,
+     "train_n": 40,
+     "val": 0.7266666666666667
+    },
+    {
+     "text": "You condense the collected documents into a brief context suitable for answering questions. The output should encompass all conflicting responses presented in the documents, ensuring clarity for the subsequent model.\n\n**Definition**: Conflicting responses are characterized as multiple statements from different documents that convey mutually exclusive or varying information about the question, which may include names, dates, figures, or descriptions of the same subject. Disregard documents that do not relate to the question for conflict assessment.\n\n**Instructions**:\n1. Compile all unique responses to the question found in any document. If there are differing responses, include all of them. Focus solely on documenting each viewpoint without asserting a \"correct\" answer.\n2. Quote each response verbatim, including all original formatting, spellings, names, and numerical figures. Do not alter content through rounding, translating, or combining information.\n3. Clearly cite the source of each response by labeling it with the document id, formatted as [dX].\n4. **Output Format**:\n   - For conflicting responses: Present them as CONFLICT: [dX] <value> vs [dY] <value>, and include additional 'vs [dZ] <value>' for multiple conflicting statements.\n   - For unanimous agreement on a single response: Format it as ANSWER: [dX] <value>.\n   - Conclude the conflict or answer line with succinct supporting details from each document directly relevant to the question, tagged with the corresponding document ids.\n5. **Token Budget Limits**:\n   - Preserve the overall structure while adhering to the token limits. If necessary, eliminate non-essential content in the following order: (1) documents not addressing the question, (2) extra context, (3) less critical supporting details. Ensure that either the CONFLICT or ANSWER line is preserved, even if other information needs to be cut.\n6. Provide solely the condensed context without any additional commentary, explanations, or introductions.\n\nEnsure that all potentially conflicting responses in the documents are clearly and thoroughly presented.",
+     "train_q": 0.8,
+     "train_n": 35,
+     "val": 0.7066666666666667
+    },
+    {
+     "text": "You are assigned the responsibility of summarizing the acquired documents into a concise context that effectively aids in answering questions. Your output should encompass all distinct and contradictory responses found within the documents, ensuring clarity for subsequent exploration.\n\n**Definition**: Contradictory responses are characterized by various statements from different documents that provide exclusive or opposing information concerning a question, such as differing names, dates, statistics, or descriptions pertaining to the same topic. Prioritize documents that are pertinent to the question when evaluating discrepancies.\n\n**Instructions**:\n1. Collect all distinct responses to the question identified in the documents. Explicitly list each differing response without amalgamating or altering the language. Your aim is to distinctly represent each perspective.\n2. Each response should be quoted verbatim as presented in the document, retaining the original formatting, spelling, and numerical values. No modifications should be made to the data by rounding, translating, or merging information.\n3. Clearly indicate the source of each response with a label denoting the document id, structured as [dX].\n4. **Output Format**:\n   - For contradictory responses: Format as CONFLICT: [dX] <value> vs [dY] <value> (and continue as necessary for multiple declarations).\n   - For consensus: Format as ANSWER: [dX] <value>.\n   - Provide brief supporting details for each relevant document noted with the respective document ids after each CONFLICT or ANSWER line to ensure understanding.\n5. **Token Budget Limits**:\n   - Adhere to the established structure within token constraints. If content needs to be shortened, prioritize removing (1) irrelevant documents, (2) excessive contextual information, and (3) less significant supporting details. Ensure that either the CONFLICT or ANSWER line remains intact, even if other elements must be cut.\n6. Deliver solely the condensed context with no supplementary remarks, clarifications, or introductory statements.\n\nYour objective is to comprehensively present all potentially conflicting responses from the documents in a clear and thorough manner without omitting any vital information.",
+     "train_q": 0.7714285714285715,
+     "train_n": 35,
+     "val": 0.74
+    }
+   ],
+   "best_val": 0.74,
+   "best_train_q": 0.8285714285714286
+  }
+ ],
+ "status": "done",
+ "peak_step": 2,
+ "metric_items_requested": 5206,
+ "metric_items_evaluated": 3859,
+ "reflection_calls": {
+  "grad": 36,
+  "edit": 144,
+  "para": 304
+ },
+ "parse_failures": {
+  "grad": 0,
+  "edit": 2,
+  "para": 0
+ },
+ "elapsed_s": 2782.6,
+ "client_summary": {
+  "calls_total": 8209,
+  "calls_cached": 8,
+  "calls_uncached": 8201,
+  "calls_legacy_cached": 0,
+  "by_model": {
+   "microsoft/phi-4": {
+    "calls": 3866,
+    "in_tokens_est": 16436434,
+    "out_tokens_est": 876846,
+    "usd_est": 1.273308819999999
+   },
+   "meta-llama/llama-3.1-8b-instruct": {
+    "calls": 3853,
+    "in_tokens_est": 3230365,
+    "out_tokens_est": 231724,
+    "usd_est": 0.08827017699999992
+   },
+   "openai/gpt-4o-mini": {
+    "calls": 482,
+    "in_tokens_est": 413908,
+    "out_tokens_est": 191525,
+    "usd_est": 0.1704923999999998
+   }
+  },
+  "usd_est_total": 1.5320713969999986,
+  "usd_spent": 1.532071396999996,
+  "unpriced_models": [],
+  "mode": "execute"
+ },
+ "examples_seen": [
+  "44c054da98b13195c67b90dcc5a8b6ac35f1950dbc7610a81fcea1964a8e960f"
+ ],
+ "final": {
+  "instruction": "You are assigned the responsibility of summarizing the acquired documents into a concise context that effectively aids in answering questions. Your output should encompass all distinct and contradictory responses found within the documents, ensuring clarity for subsequent exploration.\n\n**Definition**: Contradictory responses are characterized by various statements from different documents that provide exclusive or opposing information concerning a question, such as differing names, dates, statistics, or descriptions pertaining to the same topic. Prioritize documents that are pertinent to the question when evaluating discrepancies.\n\n**Instructions**:\n1. Collect all distinct responses to the question identified in the documents. Explicitly list each differing response without amalgamating or altering the language. Your aim is to distinctly represent each perspective.\n2. Each response should be quoted verbatim as presented in the document, retaining the original formatting, spelling, and numerical values. No modifications should be made to the data by rounding, translating, or merging information.\n3. Clearly indicate the source of each response with a label denoting the document id, structured as [dX].\n4. **Output Format**:\n   - For contradictory responses: Format as CONFLICT: [dX] <value> vs [dY] <value> (and continue as necessary for multiple declarations).\n   - For consensus: Format as ANSWER: [dX] <value>.\n   - Provide brief supporting details for each relevant document noted with the respective document ids after each CONFLICT or ANSWER line to ensure understanding.\n5. **Token Budget Limits**:\n   - Adhere to the established structure within token constraints. If content needs to be shortened, prioritize removing (1) irrelevant documents, (2) excessive contextual information, and (3) less significant supporting details. Ensure that either the CONFLICT or ANSWER line remains intact, even if other elements must be cut.\n6. Deliver solely the condensed context with no supplementary remarks, clarifications, or introductory statements.\n\nYour objective is to comprehensively present all potentially conflicting responses from the documents in a clear and thorough manner without omitting any vital information.",
+  "beam_index": 3,
+  "val": 0.74,
+  "train_q": 0.7714285714285715,
+  "final_beam_val": [
+   0.6866666666666666,
+   0.7266666666666667,
+   0.7066666666666667,
+   0.74
+  ],
+  "selected_by": "val",
+  "path": "prompts/openrouter/c3p.txt"
+ }
+}

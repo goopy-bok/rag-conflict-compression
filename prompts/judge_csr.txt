@@ -1,0 +1,32 @@
+You are given a QUESTION, a CONTEXT, and two candidate answers A and B.
+Judge ONLY from the CONTEXT. Do not use outside knowledge, and do not decide which candidate is true.
+The two candidates are expected to disagree with each other. That is the point of the task: a CONTEXT that keeps both answers is the desired outcome.
+
+For each candidate, decide two things independently.
+
+supported = true when the CONTEXT explicitly contains the candidate's value or entity (or an equivalent wording of it), stated as an answer to the QUESTION, so that a reader of the CONTEXT alone could arrive at this candidate.
+- If the candidate's value or entity does not explicitly appear in the CONTEXT, supported = false. Do not infer it, guess it, or accept it because it is plausible.
+- A candidate is still supported when the CONTEXT also contains the other candidate, or says the sources disagree.
+
+distorted = true ONLY in one of these three cases:
+ (a) changed value: the CONTEXT gives this candidate's fact with a different number, date, or entity than the candidate (for example 1,342 km became 1,432 km, or Herat became Tehran);
+ (b) misattribution: the candidate's value appears, but the CONTEXT attaches it to a different source, person, event, or subject than the one the QUESTION asks about (its origin is swapped or wrong);
+ (c) merge: the two candidates are blended into one statement so that neither candidate can be recovered separately (for example "about 20-20.5 acres" or an averaged value).
+distorted = false in every other case. In particular, NONE of the following is a distortion:
+ - the candidate disagrees with the other candidate, or with another statement in the CONTEXT;
+ - the CONTEXT signals or describes a conflict between sources;
+ - the candidate is simply absent from the CONTEXT (that is supported = false, distorted = false);
+ - you believe the candidate is factually wrong.
+
+Boundary examples:
+ 1. Candidate "1,333 km (828 mi)"; CONTEXT says "about 1,333 km". Rounding, unit omission, or a date format change ("21 August 1968" vs "August 21st 1968") keeps the value: supported = true, distorted = false.
+ 2. QUESTION "Where did Lahiji settle after Nurbaksh's death?"; candidate "Herat"; CONTEXT says "Lahiji settled in Shiraz, while Nurbaksh's son moved to Herat." The value Herat appears but is attached to a different person (swapped attribution): supported = false, distorted = true.
+ 3. Candidates "1919" and "1918"; CONTEXT says "Grabinoulor first appeared in 1919 or 1918". Both values are listed separately: both supported = true, both distorted = false.
+
+conflict_signaled = true when the CONTEXT itself indicates that the sources disagree (for example "one source states X, while another states Y").
+
+Return JSON only:
+{"a_supported": true|false, "a_distorted": true|false,
+ "b_supported": true|false, "b_distorted": true|false,
+ "conflict_signaled": true|false,
+ "rationale": "<one sentence>"}

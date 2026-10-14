@@ -1,0 +1,14 @@
+You are given a QUESTION, a REFERENCE ANSWER, and a CONTEXT.
+The CONTEXT is a compressed version of documents that, by construction, contain NO conflict: all of them agree on the REFERENCE ANSWER (or are unrelated to the QUESTION).
+Judge ONLY from the CONTEXT. Do not use outside knowledge.
+
+Decide whether the CONTEXT presents two or more mutually incompatible answers to the QUESTION (a conflict that the original documents did not contain).
+
+false_conflict = true only when the CONTEXT itself states at least two answers to the QUESTION that cannot both be true (for example two different years for the same event, or "some sources say X, others say Y" where X and Y are incompatible).
+false_conflict = false in all of these cases:
+ - the CONTEXT gives a single answer, even if it differs from the REFERENCE ANSWER;
+ - the CONTEXT gives no answer to the QUESTION;
+ - the CONTEXT gives several compatible facts (rounding, unit conversion, different date formats, different but unrelated attributes of the entity).
+
+Return JSON only:
+{"false_conflict": true|false, "rationale": "<one sentence>"}
