@@ -51,6 +51,8 @@ TEST_SPLITS = {"test_id", "test_ood1", "test_ood2", "distractor"}
 FEWSHOT_FILE = ROOT_DIR / "prompts" / "c2_fewshot.json"
 
 
+# prompts/c2_fewshot.json에 실린 C2 few-shot 예시들의 source_id 집합을 돌려준다(파일이 없으면 빈 집합).
+# load_split이 dev 분할에서 이 id들을 조건과 무관하게 빼므로, 조건 간 짝 비교가 같은 문항 집합 위에서 이뤄진다.
 def fewshot_source_ids(path: Path = FEWSHOT_FILE) -> set[str]:
     """dev ids used as C2 few-shot examples. Dropped from dev for every condition so that
     paired comparisons run on the same instances (guide v2 section 5)."""
@@ -59,6 +61,10 @@ def fewshot_source_ids(path: Path = FEWSHOT_FILE) -> set[str]:
     return {ex["source_id"] for ex in json.loads(path.read_text(encoding="utf-8")) if "source_id" in ex}
 
 
+# 분할 이름으로 문항 목록(JSONL 한 줄 = dict 하나)을 읽어 돌려준다. 시험형 분할(TEST_SPLITS)은 파일을 열기 전에
+# seal.check_test_access로 접근 허용 여부를 확인하며, seal 모듈이 없으면 ImportError로 멈춘다.
+# few-shot 예시 문항 제외는 split == "dev"이고 data_path를 주지 않았을 때만 한다(dev50·dev_distractor는 제외하지 않음).
+# limit은 앞에서부터 자른다.
 def load_split(split: str, data_path: Path | None = None, limit: int | None = None) -> list[dict]:
     if split not in SPLITS:
         raise SystemExit(f"unknown split {split!r}; choose from {sorted(SPLITS)}")
@@ -76,6 +82,8 @@ def load_split(split: str, data_path: Path | None = None, limit: int | None = No
     return rows[:limit] if limit else rows
 
 
+# conditions.yaml에서 조건의 instruction(필수)·examples(선택) 경로를 읽어 {seed}를 채운 뒤 PromptCompressor를 만든다.
+# 등록되지 않은 조건이면 SystemExit. run_condition 외에 pilot_select.py·pretest_gate.py도 이 함수를 쓴다.
 def build_compressor(condition: str, seed: int, client, model: str,
                      conditions_config: Path = CONDITIONS_CONFIG) -> PromptCompressor:
     conds = yaml.safe_load(conditions_config.read_text(encoding="utf-8"))
@@ -87,6 +95,8 @@ def build_compressor(condition: str, seed: int, client, model: str,
                             examples_path=ROOT_DIR / ex.format(seed=seed) if ex else None)
 
 
+# freeze 명령용: 주어진 조건들의 instruction·examples 파일 경로를 중복 없이(처음 등장 순서 유지) 돌려준다.
+# 경로 템플릿에 {seed}가 있으면 seed마다 한 번씩 펼친다. 하나라도 없으면 누락 목록 전체를 담아 FileNotFoundError를 낸다.
 def condition_prompt_files(conditions: list[str], seeds: list[int],
                            conditions_config: Path = CONDITIONS_CONFIG) -> list[Path]:
     """Instruction and example files of the given conditions; seed-templated paths once per seed.
@@ -108,10 +118,17 @@ def condition_prompt_files(conditions: list[str], seeds: list[int],
     return paths
 
 
+# --eval-judge/--opt-judge를 주지 않았을 때의 judge 역할: 시험형 분할이면 eval_judge, 그 외(dev 계열)는 opt_judge.
+# 실제 모델 id는 models.yaml(또는 CCD_MODELS_CONFIG가 가리키는 파일)의 roles에서 정해진다.
 def default_judge_role(split: str) -> str:
     return "eval_judge" if split in TEST_SPLITS else "opt_judge"
 
 
+# 조건 1개 × 분할 1개 × 압축비 r 1개 × seed 1개를 실행해 문항별 레코드 목록을 돌려준다. CLI run·estimate 외에
+# explore_compressor.py와 scripts/run_openrouter_expanded.py도 호출한다. 압축기는 roles["compressor"], 하류 모델은
+# roles["downstream"], judge는 judge_role(기본 default_judge_role)의 모델이며 CSR·FCR·D judge가 같은 모델을 쓴다.
+# dry_run이 아니면 <결과폴더>/<condition>_<split>_r<r>_s<seed>.jsonl.partial에 한 줄씩 쓰고 끝나면 os.replace로 정식
+# 이름으로 바꾼다(mock은 results/mock/ 아래). .partial이 남아 있으면 읽히는 레코드는 유지하고 남은 id만 처리한다.
 def run_condition(condition: str, split: str, r: float, client: LLMClient, seed: int = 0,
                   limit: int | None = None, judge_role: str | None = None,
                   results_dir: Path | None = None, conditions_config: Path | None = None,
@@ -127,6 +144,10 @@ def run_condition(condition: str, split: str, r: float, client: LLMClient, seed:
     csr_j, fcr_j = CSRJudge(client, judge_model), FCRJudge(client, judge_model)
     gen, d_j = DownstreamGenerator(client, down_model), DJudge(client, judge_model)
 
+    # 문항 1건 처리(ThreadPoolExecutor에서 병렬 실행): compute_budget → compressor.compress → 충돌 문항은 CSRJudge,
+    # conflict_type == "none"(distractor)은 FCRJudge → downstream=True면 DownstreamGenerator.answer와 DJudge → 결과 JSONL
+    # 한 줄이 될 dict. csr·csr_lenient·csr_strict·signal(judge의 conflict_signaled)은 distractor면 None, false_conflict는 반대다.
+    # dry_run에서 빈 응답이면 judge·하류에는 자리표시 텍스트를 넘기지만, 레코드의 compressed에는 comp["text"]를 그대로 저장한다.
     def process(inst: dict) -> dict:
         budget = compute_budget(inst["total_tokens"], r)
         comp = compressor.compress(inst, budget)
@@ -214,6 +235,8 @@ def run_condition(condition: str, split: str, r: float, client: LLMClient, seed:
     return records
 
 
+# client.summary()가 돌려준 호출 통계(전체·캐시·미캐시 호출 수, 모델별 호출·토큰·추정 비용)를 표로 출력한다.
+# 단가 미정 모델은 TO_CONFIRM으로 표시하고 합계에서 뺀다. dry_run이면 압축기 재시도 호출이 추정에 빠진다고 알린다.
 def print_summary(s: dict) -> None:
     print(f"\n== LLM call summary (mode={s['mode']}) ==")
     print(f"calls total {s['calls_total']} | cached {s['calls_cached']} "
@@ -230,6 +253,8 @@ def print_summary(s: dict) -> None:
               "(output = max_tokens x ratio; compressor retry calls cannot be predicted and are not counted).")
 
 
+# run·estimate 서브커맨드가 공유하는 옵션(--limit, --eval-judge/--opt-judge 택일, --no-downstream, --results-dir,
+# --conditions-config)을 붙인다.
 def _add_common(p: argparse.ArgumentParser) -> None:
     p.add_argument("--limit", type=int)
     g = p.add_mutually_exclusive_group()
@@ -243,6 +268,9 @@ def _add_common(p: argparse.ArgumentParser) -> None:
                    help="path to conditions yaml (default: $CCD_CONDITIONS_CONFIG or configs/conditions.yaml)")
 
 
+# CLI 진입점. freeze는 condition_prompt_files 결과를 seal.freeze_prompts에 넘긴다. run은 --mode execute일 때
+# --max-cost를 요구하고 run_condition을 한 번 돌린다. estimate는 dry_run 클라이언트 하나로 조건×분할×r×seed 조합을
+# 모두 돌려 조합별 미캐시 호출 수를 표로 찍는다. run·estimate 모두 마지막에 print_summary를 부른다.
 def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
