@@ -37,6 +37,9 @@ CONDITION = "C3-M"
 DEFAULT_START = ROOT_DIR / "prompts" / "c2_best.txt"
 
 
+# 산출물 경로 3개(prompt=c3m.txt, program=c3m.json, log=apo_log_C3-M_seed0.json)를 dict로 돌려준다.
+# 기준 디렉터리는 인자 → CCD_PROMPTS_DIR/CCD_REPORTS_DIR → prompts/, reports/ 순이며 mock 모드면 mock/ 하위를 쓴다.
+# 로그 파일명의 seed0은 고정 문자열이라 run_mipro의 seed 값과 무관하다.
 def output_paths(mode: str, prompts_dir: Path | None = None, reports_dir: Path | None = None) -> dict[str, Path]:
     prompts_base = Path(prompts_dir or os.environ.get("CCD_PROMPTS_DIR") or ROOT_DIR / "prompts")
     reports_base = Path(reports_dir or os.environ.get("CCD_REPORTS_DIR") or ROOT_DIR / "reports")
@@ -45,6 +48,12 @@ def output_paths(mode: str, prompts_dir: Path | None = None, reports_dir: Path |
             "log": reports_base / sub / f"apo_log_{CONDITION}_seed0.json"}
 
 
+# DSPy MIPROv2로 압축기 지시문만 최적화한다(C3-M). 시작 지시문으로 BudgetedCompressor를 만들어 train으로 탐색, val로 평가해 compile한다.
+# max_bootstrapped_demos=0, max_labeled_demos=0이라 데모는 붙지 않고, 고정 3-shot은 examples 입력으로만 들어간다.
+# 지표는 make_metric(feedback=False)의 float 점수(opt_judge 역할), 제안 모델은 reflection 역할(temperature 1.0, max_tokens 4096),
+# 과제 모델은 compressor 역할(temperature 0.0)이다. LM 오류가 있으면 status=error, 비용 상한에 닿으면 budget_exceeded다.
+# 로그(trial별 점수·후보 지시문·예시 해시·비용)는 항상 쓰고, c3m.txt·c3m.json은 status가 ok일 때만 쓴 뒤 로그 dict를 돌려준다.
+# 주의: seed 인자는 MIPROv2와 로그에만 전달되고 분할은 항상 load_apo_split(0)이다. optuna가 없으면 SystemExit로 멈춘다.
 def run_mipro(client, *, start_instruction: Path = DEFAULT_START, split: dict | None = None,
               auto: str | None = "medium", num_candidates: int | None = None, num_trials: int | None = None,
               minibatch: bool = True, out: dict[str, Path] | None = None, seed: int = 0) -> dict:
@@ -112,6 +121,9 @@ def run_mipro(client, *, start_instruction: Path = DEFAULT_START, split: dict | 
     return log
 
 
+# CLI 진입점. --estimate면 apo_estimate.mipro_rows 표만 출력한다. execute 모드는 --max-cost가 필수다.
+# C2 확정 경고는 stdout으로 출력하고(apo_protegi는 stderr), run_mipro를 기본값(auto="medium", seed 0)으로 부른다.
+# --seed 플래그는 없다. 실행 후 비용 요약을 출력하고, status가 ok가 아니면 SystemExit로 끝낸다.
 def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--mode", choices=["mock", "execute"], default="mock")

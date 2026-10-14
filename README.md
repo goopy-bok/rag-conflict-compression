@@ -75,6 +75,38 @@ phi-4 실험에서는 모델 계열이 겹치지 않도록 역할마다 다른 �
 
 ## 3. 저장소 구조
 
+### 핵심 파일 지도
+
+처음 보는 분은 아래 파일부터 보시면 됩니다. 실험이 어떻게 돌아가는지는 `src/`의 다섯 파일에, 무엇이 나왔는지는 `results/openrouter_phi4_expanded/`에 있습니다.
+
+```
+rag-conflict-compression/
+├── configs/
+│   ├── models_openrouter.yaml       # 역할별 모델: phi-4(압축·하류 답변)와 계열이 다른 judge·반성 모델 3종
+│   └── conditions_openrouter.yaml   # 조건 C0~C3-M → 지시문·예시 파일 경로
+├── src/
+│   ├── run.py                       # [핵심] 실험 러너: 문항마다 압축 → 채점 → 하류 답변 → 한 줄 기록
+│   ├── judge.py                     # [핵심] LLM-as-a-Judge 채점기: CSR·FCR·D 판정
+│   ├── apo_protegi.py               # [핵심] C3-P 지시문을 만든 ProTeGi 최적화
+│   ├── apo_mipro.py                 # [핵심] C3-M 지시문을 만든 MIPROv2 최적화
+│   └── stats.py                     # [핵심] 지표 집계와 가설 검정, 결과 보고서 생성
+├── prompts/openrouter/
+│   ├── c3p.txt                      # 최적화 결과 C3-P 지시문
+│   └── c3m.txt                      # 최적화 결과 C3-M 지시문
+├── reports/openrouter/
+│   ├── apo_log_C3-P_seed0.json      # ProTeGi 실행 로그: 설정, 후보, 점수
+│   ├── apo_log_C3-M_seed0.json      # MIPROv2 실행 로그: 설정, 시도, 점수
+│   └── protegi_trace.jsonl          # ProTeGi 단계별 후보·검증 점수 기록
+└── results/
+    ├── openrouter_phi4_expanded/    # [핵심] 최종 결과: 1,354문항 × 5조건 = 6,770건
+    │   ├── FINAL_BENCHMARK_REPORT.md   # 조건별 지표, 가설 검정 표
+    │   ├── FROZEN_PROMPTS.json         # 실행에 쓴 프롬프트의 SHA-256
+    │   └── <조건>_<분할>_r0.3_s0.jsonl  # 원자료 20개 (C0·C1·C2·C3-P·C3-M × 4개 분할)
+    └── openrouter_phi4/             # 1차 실행: 554문항 × 5조건 = 2,770건 (구성은 위와 같음)
+```
+
+### 전체 구조
+
 ```
 rag-conflict-compression/
 ├── README.md                ← 이 문서
